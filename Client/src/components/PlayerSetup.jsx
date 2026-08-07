@@ -10,49 +10,118 @@ function PlayerSetup({ mode, startGame }) {
       alert("Enter Player 1 name");
       return;
     }
-    if (mode === "player" && player2.trim() === "") {
+
+    if (
+      mode === "player" &&
+      player2.trim() === ""
+    ) {
       alert("Enter Player 2 name");
       return;
     }
+
     startGame({
-      player1,
-      player2: mode === "computer" ? "Computer" : player2,
-      difficulty,
+      player1: player1.trim(),
+
+      player2:
+        mode === "computer"
+          ? "Computer"
+          : player2.trim(),
+
+      difficulty:
+        mode === "computer"
+          ? difficulty
+          : null,
     });
   }
 
   return (
     <div className="game-container">
-      <h1 className="title">🧠 QuizTac</h1>
-      <h2>Player Setup</h2>
-      <input
-        className="input-box"
-        placeholder="Player 1 Name"
-        value={player1}
-        onChange={(e) => setPlayer1(e.target.value)}
-      />
+
+      {/* PLAYER VS PLAYER */}
+
       {mode === "player" && (
-        <input
-          className="input-box"
-          placeholder="Player 2 Name"
-          value={player2}
-          onChange={(e) => setPlayer2(e.target.value)}
-        />
+        <>
+          <h1 className="title">
+            ⚔ Player vs Player
+          </h1>
+
+          <h2>Player Setup</h2>
+
+          <input
+            className="input-box"
+            placeholder="Player 1 Name"
+            value={player1}
+            onChange={(e) =>
+              setPlayer1(e.target.value)
+            }
+          />
+
+          <input
+            className="input-box"
+            placeholder="Player 2 Name"
+            value={player2}
+            onChange={(e) =>
+              setPlayer2(e.target.value)
+            }
+          />
+
+          <button
+            className="mode-btn"
+            onClick={handleStart}
+          >
+            🚀 Start Game
+          </button>
+        </>
       )}
+
+      {/* PLAYER VS COMPUTER */}
+
       {mode === "computer" && (
-        <select
-          className="input-box"
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-        >
-          <option>Easy</option>
-          <option>Medium</option>
-          <option>Hard</option>
-        </select>
+        <>
+          <h1 className="title">
+            🤖 Player vs Computer
+          </h1>
+
+          <h2>Player Setup</h2>
+
+          <input
+            className="input-box"
+            placeholder="Player 1 Name"
+            value={player1}
+            onChange={(e) =>
+              setPlayer1(e.target.value)
+            }
+          />
+
+          <select
+            className="input-box"
+            value={difficulty}
+            onChange={(e) =>
+              setDifficulty(e.target.value)
+            }
+          >
+            <option value="Easy">
+              Easy
+            </option>
+
+            <option value="Medium">
+              Medium
+            </option>
+
+            <option value="Hard">
+              Hard
+            </option>
+          </select>
+
+          <button
+            className="mode-btn"
+            onClick={handleStart}
+          >
+            🚀 Start Game
+          </button>
+        </>
       )}
-      <button className="mode-btn" onClick={handleStart}>
-        🚀 Start Game
-      </button>
+
     </div>
   );
 }

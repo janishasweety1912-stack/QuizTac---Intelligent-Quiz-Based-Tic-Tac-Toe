@@ -1,17 +1,57 @@
 import React from "react";
 
-function GameMode({ setMode }) {
+function GameMode({
+  setMode,
+  openHistory,
+  openLeaderboard
+}) {
   return (
     <div className="game-container">
-      <h1 className="title">🧠 QuizTac</h1>
-      <p className="subtitle">Test Your Brain. Conquer The Board.</p>
-      <h2>Choose Game Mode</h2>
-      <button className="mode-btn" onClick={() => setMode("player")}>
+
+      <h1 className="title">
+        🧠 QuizTac
+      </h1>
+
+      <p className="subtitle">
+        Test Your Brain. Conquer The Board.
+      </p>
+
+      <h2>
+        Choose Game Mode
+      </h2>
+
+      <button
+        className="mode-btn"
+        onClick={() =>
+          setMode("player")
+        }
+      >
         ⚔ Player vs Player
       </button>
-      <button className="mode-btn" onClick={() => setMode("computer")}>
+
+      <button
+        className="mode-btn"
+        onClick={() =>
+          setMode("computer")
+        }
+      >
         🤖 Player vs Computer
       </button>
+
+      <button
+        className="mode-btn history-btn"
+        onClick={openHistory}
+      >
+        📜 Game History
+      </button>
+
+      <button
+        className="mode-btn history-btn"
+        onClick={openLeaderboard}
+      >
+        🏆 Leaderboard
+      </button>
+
     </div>
   );
 }
