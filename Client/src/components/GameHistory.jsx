@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "../style/GameHistory.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function GameHistory({ closeHistory }) {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState(null);
-  const [deletingAll, setDeletingAll] = useState(false);
-
-  // -----------------------------------
-  // FETCH GAME HISTORY
-  // -----------------------------------
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/games")
+    fetch(`${API_URL}/api/games`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(
@@ -41,152 +37,36 @@ function GameHistory({ closeHistory }) {
       });
   }, []);
 
-  // -----------------------------------
-  // DELETE ONE GAME
-  // -----------------------------------
-
-  async function deleteGame(id) {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this game?"
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
-
-    try {
-      setDeletingId(id);
-
-      const response = await fetch(
-        `http://localhost:5000/api/games/${id}`,
-        {
-          method: "DELETE"
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-          "Failed to delete game"
-        );
-      }
-
-      // Remove game from UI
-      setGames((prevGames) =>
-        prevGames.filter(
-          (game) => game._id !== id
-        )
-      );
-
-    } catch (error) {
-      console.log(
-        "Delete game error:",
-        error
-      );
-
-      alert(
-        "Unable to delete this game."
-      );
-
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
-  // -----------------------------------
-  // DELETE ALL HISTORY
-  // -----------------------------------
-
-  async function deleteAllGames() {
-    if (games.length === 0) {
-      return;
-    }
-
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete ALL game history? This action cannot be undone."
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
-
-    try {
-      setDeletingAll(true);
-
-      const response = await fetch(
-        "http://localhost:5000/api/games",
-        {
-          method: "DELETE"
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-          "Failed to delete history"
-        );
-      }
-
-      setGames([]);
-
-    } catch (error) {
-      console.log(
-        "Delete all games error:",
-        error
-      );
-
-      alert(
-        "Unable to delete game history."
-      );
-
-    } finally {
-      setDeletingAll(false);
-    }
-  }
-
-  // -----------------------------------
-  // LOADING
-  // -----------------------------------
-
   if (loading) {
     return (
       <div className="history-page">
-
-        <div className="history-header">
-          <h1>📜 Game History</h1>
-          <p>
-            Loading your previous games...
-          </p>
-        </div>
-
         <div className="history-loading">
           <div className="loading-spinner"></div>
-          <p>Loading Game History...</p>
-        </div>
 
+          <h2>Loading Game History...</h2>
+
+          <p>
+            Fetching your previous games
+          </p>
+        </div>
       </div>
     );
   }
 
-  // -----------------------------------
-  // ERROR
-  // -----------------------------------
-
   if (error) {
     return (
       <div className="history-page">
-
-        <div className="history-header">
-          <h1>📜 Game History</h1>
-        </div>
-
         <div className="history-error">
-          <h2>⚠️</h2>
-          <p>{error}</p>
+          <div className="error-icon">
+            ⚠️
+          </div>
+
+          <h2>{error}</h2>
+
+          <p>
+            Please check your connection
+            and try again.
+          </p>
 
           <button
             className="mode-btn"
@@ -195,14 +75,9 @@ function GameHistory({ closeHistory }) {
             🏠 Back
           </button>
         </div>
-
       </div>
     );
   }
-
-  // -----------------------------------
-  // MAIN UI
-  // -----------------------------------
 
   return (
     <div className="history-page">
@@ -212,65 +87,50 @@ function GameHistory({ closeHistory }) {
       <div className="history-header">
 
         <div>
-          <h1>📜 Game History</h1>
+          <span className="history-label">
+            QUIZTAC
+          </span>
+
+          <h1>
+            📜 Game History
+          </h1>
 
           <p>
-            Review your previous
-            QuizTac battles
+            Review your previous matches
           </p>
         </div>
 
         <div className="history-count">
-          {games.length}{" "}
-          {games.length === 1
-            ? "Game"
-            : "Games"}
+          <span>{games.length}</span>
+          <small>
+            {games.length === 1
+              ? "Game"
+              : "Games"}
+          </small>
         </div>
 
       </div>
 
-      {/* ACTIONS */}
-
-      {games.length > 0 && (
-        <div className="history-actions">
-
-          <button
-            className="delete-all-btn"
-            onClick={deleteAllGames}
-            disabled={deletingAll}
-          >
-            {deletingAll
-              ? "Deleting..."
-              : "🧹 Clear All History"}
-          </button>
-
-        </div>
-      )}
-
       {/* EMPTY STATE */}
 
       {games.length === 0 ? (
-
-        <div className="history-empty">
+        <div className="empty-history">
 
           <div className="empty-icon">
             🎮
           </div>
 
           <h2>
-            No Games Yet
+            No games played yet
           </h2>
 
           <p>
-            Play your first QuizTac
-            game and your results
-            will appear here.
+            Start your first QuizTac
+            match to see it here.
           </p>
 
         </div>
-
       ) : (
-
         <div className="history-container">
 
           {games.map((game) => {
@@ -278,17 +138,21 @@ function GameHistory({ closeHistory }) {
             const isDraw =
               game.winner === "Draw";
 
-            const player1Won =
-              game.winner ===
-              game.player1;
+            const isPlayer1Winner =
+              game.winner === game.player1;
 
-            const player2Won =
-              game.winner ===
-              game.player2;
+            const isPlayer2Winner =
+              game.winner === game.player2;
 
             return (
               <div
-                className="history-card"
+                className={`history-card ${
+                  isDraw
+                    ? "draw-card"
+                    : isPlayer1Winner
+                    ? "winner-card"
+                    : "loss-card"
+                }`}
                 key={game._id}
               >
 
@@ -296,153 +160,131 @@ function GameHistory({ closeHistory }) {
 
                 <div className="history-card-top">
 
-                  <div className="match-title">
+                  <span className="game-number">
+                    GAME
+                  </span>
 
-                    <span>
-                      🎮
-                    </span>
+                  <span
+                    className={`result-badge ${
+                      isDraw
+                        ? "draw-badge"
+                        : isPlayer1Winner
+                        ? "win-badge"
+                        : "loss-badge"
+                    }`}
+                  >
+                    {isDraw
+                      ? "🤝 DRAW"
+                      : isPlayer1Winner
+                      ? "🏆 WIN"
+                      : "💀 LOSS"}
+                  </span>
 
-                    <h3>
-                      {game.player1}
-                      {" "}
-                      <span className="vs">
-                        VS
+                </div>
+
+                {/* PLAYERS */}
+
+                <div className="match-players">
+
+                  <div
+                    className={`history-player ${
+                      isPlayer1Winner
+                        ? "match-winner"
+                        : ""
+                    }`}
+                  >
+                    <div className="player-symbol x-symbol">
+                      X
+                    </div>
+
+                    <div>
+                      <strong>
+                        {game.player1}
+                      </strong>
+
+                      <span>
+                        {isPlayer1Winner
+                          ? "Winner"
+                          : "Player 1"}
                       </span>
-                      {" "}
-                      {game.player2}
-                    </h3>
+                    </div>
 
+                    <b>
+                      {game.player1Points}
+                    </b>
                   </div>
 
-                  <button
-                    className="delete-game-btn"
-                    onClick={() =>
-                      deleteGame(
-                        game._id
-                      )
-                    }
-                    disabled={
-                      deletingId ===
-                      game._id
-                    }
-                    title="Delete this game"
+                  <div className="vs-text">
+                    VS
+                  </div>
+
+                  <div
+                    className={`history-player ${
+                      isPlayer2Winner
+                        ? "match-winner"
+                        : ""
+                    }`}
                   >
-                    {deletingId ===
-                    game._id
-                      ? "..."
-                      : "🗑️"}
-                  </button>
+                    <div className="player-symbol o-symbol">
+                      O
+                    </div>
+
+                    <div>
+                      <strong>
+                        {game.player2}
+                      </strong>
+
+                      <span>
+                        {isPlayer2Winner
+                          ? "Winner"
+                          : "Player 2"}
+                      </span>
+                    </div>
+
+                    <b>
+                      {game.player2Points}
+                    </b>
+                  </div>
 
                 </div>
 
-                {/* MODE */}
+                {/* GAME INFORMATION */}
 
-                <div className="history-meta">
-
-                  <span className="mode-badge">
-                    {game.mode ===
-                    "computer"
-                      ? "🤖 Player vs Computer"
-                      : "⚔️ Player vs Player"}
-                  </span>
-
-                  <span className="date-badge">
-                    📅{" "}
-                    {new Date(
-                      game.createdAt
-                    ).toLocaleString()}
-                  </span>
-
-                </div>
-
-                {/* RESULT */}
-
-                <div
-                  className={`winner-banner ${
-                    isDraw
-                      ? "draw-result"
-                      : player1Won
-                      ? "player1-result"
-                      : "player2-result"
-                  }`}
-                >
-
-                  <span className="winner-icon">
-                    {isDraw
-                      ? "🤝"
-                      : "🏆"}
-                  </span>
+                <div className="history-info">
 
                   <div>
-                    <small>
-                      RESULT
-                    </small>
+                    <span>
+                      🎮 Mode
+                    </span>
 
                     <strong>
-                      {isDraw
-                        ? "It's a Draw"
-                        : `${game.winner} Wins`}
+                      {game.mode ===
+                      "computer"
+                        ? "Player vs Computer"
+                        : "Player vs Player"}
                     </strong>
                   </div>
 
-                </div>
-
-                {/* SCORE */}
-
-                <div className="score-section">
-
-                  <div
-                    className={`player-score ${
-                      player1Won
-                        ? "winner-player"
-                        : ""
-                    }`}
-                  >
-
-                    <div className="player-info">
-                      <span className="player-symbol player-one">
-                        X
-                      </span>
-
-                      <span>
-                        {game.player1}
-                      </span>
-                    </div>
+                  <div>
+                    <span>
+                      🏆 Result
+                    </span>
 
                     <strong>
-                      {game.player1Points}
-                      <small>
-                        pts
-                      </small>
+                      {game.winner}
                     </strong>
-
                   </div>
 
-                  <div
-                    className={`player-score ${
-                      player2Won
-                        ? "winner-player"
-                        : ""
-                    }`}
-                  >
-
-                    <div className="player-info">
-                      <span className="player-symbol player-two">
-                        O
-                      </span>
-
-                      <span>
-                        {game.player2}
-                      </span>
-                    </div>
+                  <div>
+                    <span>
+                      📅 Date
+                    </span>
 
                     <strong>
-                      {game.player2Points}
-                      <small>
-                        pts
-                      </small>
+                      {new Date(
+                        game.createdAt
+                      ).toLocaleString()}
                     </strong>
-
                   </div>
 
                 </div>
@@ -456,12 +298,16 @@ function GameHistory({ closeHistory }) {
 
       {/* BACK BUTTON */}
 
-      <button
-        className="mode-btn history-back-btn"
-        onClick={closeHistory}
-      >
-        🏠 Back to Main Menu
-      </button>
+      <div className="history-footer">
+
+        <button
+          className="mode-btn"
+          onClick={closeHistory}
+        >
+          🏠 Back to Main Menu
+        </button>
+
+      </div>
 
     </div>
   );

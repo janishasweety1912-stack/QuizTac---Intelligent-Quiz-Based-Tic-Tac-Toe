@@ -4,6 +4,8 @@ import QuestionBox from "./QuestionBox";
 import PlayerCard from "./PlayerCard";
 import ResultModal from "./ResultModal";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Board({ players, mode }) {
   const [board, setBoard] = useState(Array(9).fill(""));
   const [turn, setTurn] = useState("X");
@@ -34,11 +36,9 @@ function Board({ players, mode }) {
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
-
     [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
-
     [0, 4, 8],
     [2, 4, 6]
   ];
@@ -96,11 +96,7 @@ function Board({ players, mode }) {
     }
 
     // Prevent invalid moves
-    if (
-      board[index] ||
-      winner ||
-      activeQuestion
-    ) {
+    if (board[index] || winner || activeQuestion) {
       return;
     }
 
@@ -110,7 +106,7 @@ function Board({ players, mode }) {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/questions/random?difficulty=${difficulty}`
+        `${import.meta.env.VITE_API_URL}/api/questions/random?difficulty=${difficulty}`
       );
 
       if (!response.ok) {
@@ -151,7 +147,6 @@ function Board({ players, mode }) {
         ...question,
         duration
       });
-
     } catch (error) {
       console.log(
         "Error fetching question:",
@@ -172,7 +167,7 @@ function Board({ players, mode }) {
   ) {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/games",
+        `${import.meta.env.VITE_API_URL}/api/games`,
         {
           method: "POST",
 
@@ -229,7 +224,6 @@ function Board({ players, mode }) {
           data
         );
       }
-
     } catch (error) {
       console.log(
         "Error saving game:",
@@ -324,7 +318,8 @@ function Board({ players, mode }) {
       testBoard[i] = symbol;
 
       if (
-        checkWinner(testBoard) === symbol
+        checkWinner(testBoard) ===
+        symbol
       ) {
         return i;
       }
@@ -343,7 +338,8 @@ function Board({ players, mode }) {
     depth,
     isMaximizing
   ) {
-    const result = checkWinner(currentBoard);
+    const result =
+      checkWinner(currentBoard);
 
     // Computer wins
     if (result === "O") {
@@ -376,11 +372,12 @@ function Board({ players, mode }) {
 
           testBoard[i] = "O";
 
-          const score = minimax(
-            testBoard,
-            depth + 1,
-            false
-          );
+          const score =
+            minimax(
+              testBoard,
+              depth + 1,
+              false
+            );
 
           bestScore = Math.max(
             bestScore,
@@ -407,11 +404,12 @@ function Board({ players, mode }) {
 
         testBoard[i] = "X";
 
-        const score = minimax(
-          testBoard,
-          depth + 1,
-          true
-        );
+        const score =
+          minimax(
+            testBoard,
+            depth + 1,
+            true
+          );
 
         bestScore = Math.min(
           bestScore,
@@ -443,11 +441,12 @@ function Board({ players, mode }) {
 
         testBoard[i] = "O";
 
-        const score = minimax(
-          testBoard,
-          0,
-          false
-        );
+        const score =
+          minimax(
+            testBoard,
+            0,
+            false
+          );
 
         if (score > bestScore) {
           bestScore = score;
@@ -493,7 +492,9 @@ function Board({ players, mode }) {
     // RANDOM MOVE
     // -----------------------------------
 
-    if (players.difficulty === "Easy") {
+    if (
+      players.difficulty === "Easy"
+    ) {
       const randomIndex =
         Math.floor(
           Math.random() *
@@ -594,9 +595,13 @@ function Board({ players, mode }) {
     // UPDATE BOARD
     // -----------------------------------
 
-    const updatedBoard = [...board];
+    const updatedBoard = [
+      ...board
+    ];
 
-    updatedBoard[selectedIndex] = "O";
+    updatedBoard[
+      selectedIndex
+    ] = "O";
 
     // -----------------------------------
     // UPDATE COMPUTER POINTS
@@ -643,7 +648,9 @@ function Board({ players, mode }) {
     // CHECK DRAW
     // -----------------------------------
 
-    if (checkDraw(updatedBoard)) {
+    if (
+      checkDraw(updatedBoard)
+    ) {
       const updatedScore = {
         ...score,
 
@@ -706,7 +713,8 @@ function Board({ players, mode }) {
     // -----------------------------------
 
     if (
-      answer === activeQuestion.answer
+      answer ===
+      activeQuestion.answer
     ) {
       const updatedPoints = {
         ...points
@@ -730,7 +738,6 @@ function Board({ players, mode }) {
         selectedCell,
         updatedPoints
       );
-
     } else {
       // -----------------------------------
       // WRONG ANSWER

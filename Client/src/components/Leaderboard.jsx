@@ -6,7 +6,7 @@ function Leaderboard({ closeLeaderboard }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/games/leaderboard")
+    fetch(`${import.meta.env.VITE_API_URL}/api/games/leaderboard`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch leaderboard");
