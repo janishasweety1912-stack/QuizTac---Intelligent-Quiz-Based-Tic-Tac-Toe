@@ -1,4 +1,4 @@
-# 🧠 QuizTac — Quiz-Based Tic-Tac-Toe Game
+# 🧠 QuizTac — Intelligent Quiz Based Tic-Tac-Toe Game
 
 QuizTac is a full-stack interactive Tic-Tac-Toe game that combines traditional Tic-Tac-Toe gameplay with quiz-based challenges.
 
